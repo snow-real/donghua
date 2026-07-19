@@ -140,6 +140,60 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 .knowledge-table { width:100%; font-size:12px; }
 .knowledge-table td { padding:6px 0; border-bottom:1px solid #f1f5f9; }
 .knowledge-table .key { font-weight:600; color:#475569; width:110px; }
+
+/* Monitoring Dashboard */
+.monitor-section { margin-bottom:20px; }
+.monitor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+.monitor-refresh { font-size:12px; color:#64748b; }
+.monitor-refresh span { color:#22c55e; font-weight:600; }
+.monitor-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:20px; }
+.monitor-card { background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:18px; position:relative; overflow:hidden; transition:all 0.3s; }
+.monitor-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+.monitor-card.alarm { border-left:4px solid #ef4444; animation:alarmShake 2s infinite; }
+.monitor-card.warning-card { border-left:4px solid #F97316; }
+.monitor-card.normal-card { border-left:4px solid #22c55e; }
+@keyframes alarmShake { 0%,100%{transform:translateX(0)} 10%,30%,50%,70%,90%{transform:translateX(-2px)} 20%,40%,60%,80%{transform:translateX(2px)} }
+.monitor-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.monitor-device-name { font-size:13px; font-weight:700; color:#1A3A5C; }
+.monitor-device-tag { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:600; }
+.monitor-device-tag.normal { background:#dcfce7; color:#166534; }
+.monitor-device-tag.warning-tag { background:#ffedd5; color:#9a3412; }
+.monitor-device-tag.alarm-tag { background:#fee2e2; color:#991b1b; }
+.monitor-vibes { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+.monitor-vibe-item { text-align:center; padding:8px 4px; background:#f8fafc; border-radius:6px; }
+.monitor-vibe-label { font-size:10px; color:#94a3b8; margin-bottom:3px; }
+.monitor-vibe-value { font-size:15px; font-weight:700; color:#1A3A5C; }
+.monitor-vibe-value.warning-val { color:#F97316; }
+.monitor-vibe-value.alarm-val { color:#ef4444; }
+.monitor-vibe-unit { font-size:9px; color:#94a3b8; }
+.monitor-trend-mini { height:30px; margin-bottom:8px; }
+.monitor-status-bar { display:flex; align-items:center; gap:8px; }
+.monitor-health-light { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.monitor-health-light.green { background:#22c55e; box-shadow:0 0 8px rgba(34,197,94,0.5); }
+.monitor-health-light.yellow { background:#F97316; box-shadow:0 0 8px rgba(249,115,22,0.5); animation:pulseLight 1.5s infinite; }
+.monitor-health-light.red { background:#ef4444; box-shadow:0 0 8px rgba(239,68,68,0.5); animation:pulseLight 0.8s infinite; }
+@keyframes pulseLight { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.monitor-status-text { font-size:12px; font-weight:600; }
+.monitor-status-text.green { color:#22c55e; }
+.monitor-status-text.yellow { color:#F97316; }
+.monitor-status-text.red { color:#ef4444; }
+
+/* Early Warning Panel */
+.early-warning-panel { background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:20px; overflow:hidden; }
+.early-warning-head { background:#fff7ed; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ffedd5; }
+.early-warning-head h3 { font-size:15px; font-weight:700; color:#c2410c; display:flex; align-items:center; gap:8px; }
+.early-warning-badge { background:#ef4444; color:white; font-size:11px; font-weight:600; padding:2px 10px; border-radius:10px; animation:pulse 1.5s infinite; }
+.early-warning-list { padding:10px 20px; max-height:200px; overflow-y:auto; }
+.early-warning-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9; font-size:13px; }
+.early-warning-item:last-child { border-bottom:none; }
+.ew-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.ew-dot.red { background:#ef4444; }
+.ew-dot.orange { background:#F97316; }
+.ew-time { color:#94a3b8; font-size:11px; white-space:nowrap; }
+.ew-device { font-weight:600; color:#1A3A5C; white-space:nowrap; }
+.ew-desc { color:#64748b; flex:1; }
+.ew-action { color:#1A3A5C; font-weight:600; font-size:11px; cursor:pointer; white-space:nowrap; }
+.ew-action:hover { color:#F97316; }
 </style>
 </head>
 <body>
@@ -235,6 +289,24 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 
     <!-- ===== 故障诊断 ===== -->
     <div id="diagnosis" class="page">
+        <!-- 设备实时监控总览 -->
+        <div class="monitor-section">
+            <div class="monitor-header">
+                <h2 style="font-size:18px;font-weight:700;color:#1A3A5C;">设备实时监控总览</h2>
+                <div class="monitor-refresh">系统时间：<span id="live-time">--</span> | 刷新频率：<span>1秒/次</span></div>
+            </div>
+            <div class="monitor-grid" id="monitor-grid"></div>
+        </div>
+        <!-- 早期预警面板 -->
+        <div class="early-warning-panel">
+            <div class="early-warning-head">
+                <h3>⚠ 早期预警提醒 <span class="early-warning-badge" id="ew-count">0条</span></h3>
+                <span style="font-size:12px;color:#9a3412;">基于振动特征参数微小变化检测</span>
+            </div>
+            <div class="early-warning-list" id="ew-list">
+                <div style="text-align:center;padding:20px;color:#94a3b8;">系统监控中，暂无预警信息...</div>
+            </div>
+        </div>
         <div class="diagnosis-layout">
             <div class="model-card">
                 <div class="model-title">设备结构模型与测点布置</div>
@@ -804,9 +876,162 @@ function drawSpectrum(faultKey) {
     }
 }
 
+// ===== 设备实时监控 + 早期预警 =====
+var monitorDevices = [
+    { id:'M-102-01', name:'主风机电机', tag:'#M-102', device:'主风机电机 #M-102', position:'驱动端水平', speed:3000, power:'55 kW', status:'normal', vibes:[{l:'通频值',v:2.8,u:'mm/s',cls:''},{l:'1X',v:1.2,u:'mm/s',cls:''},{l:'2X',v:0.4,u:'mm/s',cls:''}], trendData:[2.8,2.7,2.9,2.6,2.8,2.5,2.7,2.9,2.6,2.8] },
+    { id:'M-102-02', name:'主风机电机', tag:'#M-102', device:'主风机电机 #M-102', position:'驱动端垂直', speed:3000, power:'55 kW', status:'normal', vibes:[{l:'通频值',v:2.5,u:'mm/s',cls:''},{l:'1X',v:1.0,u:'mm/s',cls:''},{l:'2X',v:0.3,u:'mm/s',cls:''}], trendData:[2.5,2.6,2.4,2.5,2.7,2.5,2.4,2.6,2.5,2.4] },
+    { id:'M-102-03', name:'主风机电机', tag:'#M-102', device:'主风机电机 #M-102', position:'非驱动端水平', speed:3000, power:'55 kW', status:'warning', vibes:[{l:'通频值',v:4.8,u:'mm/s',cls:'warning-val'},{l:'1X',v:2.5,u:'mm/s',cls:'warning-val'},{l:'2X',v:1.1,u:'mm/s',cls:''}], trendData:[3.5,3.8,4.0,4.3,4.5,4.6,4.7,4.8,4.9,4.8] },
+    { id:'G-102-01', name:'三级减速箱', tag:'#G-102', device:'三级减速箱 #G-102', position:'高速轴轴承座', speed:3000, power:'--', status:'normal', vibes:[{l:'通频值',v:3.2,u:'mm/s',cls:''},{l:'啮合频率',v:1.8,u:'mm/s',cls:''},{l:'1X',v:0.6,u:'mm/s',cls:''}], trendData:[3.2,3.1,3.3,3.0,3.2,3.1,3.3,3.2,3.1,3.2] },
+    { id:'G-102-02', name:'三级减速箱', tag:'#G-102', device:'三级减速箱 #G-102', position:'中间轴轴承座', speed:625, power:'--', status:'normal', vibes:[{l:'通频值',v:2.9,u:'mm/s',cls:''},{l:'啮合频率',v:1.5,u:'mm/s',cls:''},{l:'1X',v:0.5,u:'mm/s',cls:''}], trendData:[2.9,2.8,3.0,2.9,2.8,3.0,2.9,2.8,2.9,3.0] },
+    { id:'G-102-03', name:'三级减速箱', tag:'#G-102', device:'三级减速箱 #G-102', position:'低速轴轴承座', speed:62.5, power:'--', status:'warning', vibes:[{l:'通频值',v:5.2,u:'mm/s',cls:'warning-val'},{l:'啮合频率',v:3.0,u:'mm/s',cls:'warning-val'},{l:'1X',v:1.2,u:'mm/s',cls:''}], trendData:[3.2,3.6,4.0,4.3,4.6,4.8,5.0,5.1,5.2,5.3] }
+];
+
+var earlyWarnings = [];
+var warningIdCounter = 1;
+
+function addEarlyWarning(device, position, desc, level) {
+    var now = new Date();
+    var timeStr = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    earlyWarnings.unshift({ id:warningIdCounter++, device:device, position:position, desc:desc, level:level, time:timeStr });
+    if (earlyWarnings.length > 10) earlyWarnings.pop();
+}
+
+function renderMonitorGrid() {
+    var grid = document.getElementById('monitor-grid');
+    var html = '';
+    for (var i = 0; i < monitorDevices.length; i++) {
+        var md = monitorDevices[i];
+        var cardClass = md.status === 'alarm' ? 'alarm' : (md.status === 'warning' ? 'warning-card' : 'normal-card');
+        var tagClass = md.status === 'alarm' ? 'alarm-tag' : (md.status === 'warning' ? 'warning-tag' : 'normal');
+        var tagText = md.status === 'alarm' ? '报警' : (md.status === 'warning' ? '预警' : '正常');
+        var lightClass = md.status === 'alarm' ? 'red' : (md.status === 'warning' ? 'yellow' : 'green');
+        var statusClass = md.status === 'alarm' ? 'red' : (md.status === 'warning' ? 'yellow' : 'green');
+        var statusText = md.status === 'alarm' ? '⚠ 报警' : (md.status === 'warning' ? '⚠ 预警' : '● 正常');
+
+        // Mini trend SVG
+        var trendSvg = '<svg width="100%" height="30" viewBox="0 0 100 30"><polyline points="'+md.trendData.map(function(v,j){return (j*10)+','+(30-(v/6)*25);}).join(' ')+'" fill="none" stroke="'+(md.status==='alarm'?'#ef4444':md.status==='warning'?'#F97316':'#3b82f6')+'" stroke-width="1.5"/></svg>';
+
+        // Vibe items
+        var vibesHtml = '';
+        for (var k = 0; k < md.vibes.length; k++) {
+            vibesHtml += '<div class="monitor-vibe-item"><div class="monitor-vibe-label">'+md.vibes[k].l+'</div><div class="monitor-vibe-value '+md.vibes[k].cls+'">'+md.vibes[k].v+'<span class="monitor-vibe-unit">'+md.vibes[k].u+'</span></div></div>';
+        }
+
+        html += '<div class="monitor-card '+cardClass+'">'+
+            '<div class="monitor-card-top">'+
+                '<div><div class="monitor-device-name">'+md.name+'</div><div style="font-size:10px;color:#94a3b8;">'+md.position+'</div></div>'+
+                '<div class="monitor-device-tag '+tagClass+'">'+tagText+'</div>'+
+            '</div>'+
+            '<div class="monitor-trend-mini">'+trendSvg+'</div>'+
+            '<div class="monitor-vibes">'+vibesHtml+'</div>'+
+            '<div class="monitor-status-bar">'+
+                '<div class="monitor-health-light '+lightClass+'"></div>'+
+                '<span class="monitor-status-text '+statusClass+'">'+statusText+'</span>'+
+                '<span style="font-size:10px;color:#94a3b8;margin-left:auto;">'+md.speed+' RPM</span>'+
+            '</div>'+
+        '</div>';
+    }
+    grid.innerHTML = html;
+}
+
+function updateMonitorLive() {
+    // Update time
+    var now = new Date();
+    document.getElementById('live-time').textContent = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+
+    // Simulate vibration fluctuations with early warning detection
+    for (var i = 0; i < monitorDevices.length; i++) {
+        var md = monitorDevices[i];
+        // Fluctuate vibration values
+        for (var k = 0; k < md.vibes.length; k++) {
+            var delta = (Math.random() - 0.5) * 0.3;
+            md.vibes[k].v = Math.max(0.1, parseFloat((md.vibes[k].v + delta).toFixed(2)));
+        }
+        // Shift trend data
+        md.trendData.shift();
+        md.trendData.push(md.vibes[0].v);
+
+        // Early warning detection logic
+        var overallVib = md.vibes[0].v;
+        // Check last 3 trend values for rapid increase
+        var trendLen = md.trendData.length;
+        var recent3 = md.trendData.slice(trendLen-3);
+        var avgRecent = (recent3[0]+recent3[1]+recent3[2])/3;
+        var prev3 = md.trendData.slice(trendLen-6, trendLen-3);
+        var avgPrev = prev3.length===3 ? (prev3[0]+prev3[1]+prev3[2])/3 : avgRecent;
+
+        // Detect subtle vibration increase (early warning)
+        var increaseRate = avgPrev > 0 ? ((avgRecent - avgPrev) / avgPrev) * 100 : 0;
+
+        if (overallVib >= 10) {
+            if (md.status !== 'alarm') {
+                md.status = 'alarm';
+                md.vibes[0].cls = 'alarm-val';
+                addEarlyWarning(md.name+' '+md.tag, md.position, '振动值超限达 '+overallVib.toFixed(1)+' mm/s，立即停机检查！', 'alarm');
+            }
+        } else if (overallVib >= 4.5) {
+            if (md.status === 'normal') {
+                md.status = 'warning';
+                md.vibes[0].cls = 'warning-val';
+                var reason = increaseRate > 15 ? '振动幅值快速上升 '+increaseRate.toFixed(0)+'%' : '振动超标达 '+overallVib.toFixed(1)+' mm/s';
+                addEarlyWarning(md.name+' '+md.tag, md.position, reason+'，建议安排巡检。', 'warning');
+            }
+        } else {
+            if (md.status !== 'normal' && increaseRate < -5) {
+                md.status = 'normal';
+                md.vibes[0].cls = '';
+                addEarlyWarning(md.name+' '+md.tag, md.position, '振动恢复正常，预警解除。', 'normal');
+            }
+        }
+    }
+    renderMonitorGrid();
+    renderEarlyWarnings();
+}
+
+function renderEarlyWarnings() {
+    var list = document.getElementById('ew-list');
+    var count = document.getElementById('ew-count');
+    var alarmWarnings = [];
+    for (var i = 0; i < earlyWarnings.length; i++) {
+        if (earlyWarnings[i].level !== 'normal') alarmWarnings.push(earlyWarnings[i]);
+    }
+    count.textContent = alarmWarnings.length + '条';
+
+    if (alarmWarnings.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:#22c55e;font-weight:500;">✓ 所有设备运行正常，未检测到早期异常</div>';
+        return;
+    }
+
+    var html = '';
+    for (var i = 0; i < earlyWarnings.length; i++) {
+        var ew = earlyWarnings[i];
+        if (ew.level === 'normal') continue;
+        var dotColor = ew.level === 'alarm' ? 'red' : 'orange';
+        html += '<div class="early-warning-item">'+
+            '<div class="ew-dot '+dotColor+'"></div>'+
+            '<span class="ew-time">'+ew.time+'</span>'+
+            '<span class="ew-device">'+ew.device+'</span>'+
+            '<span class="ew-desc">'+ew.desc+'</span>'+
+            '<span class="ew-action" onclick="switchDevice(\''+(ew.device.indexOf('减速箱')!==-1?'gearbox':'motor')+'\')">查看诊断 →</span>'+
+        '</div>';
+    }
+    list.innerHTML = html;
+}
+
+function startMonitorLoop() {
+    renderMonitorGrid();
+    renderEarlyWarnings();
+    // Add initial sample warnings for demo
+    addEarlyWarning('三级减速箱 #G-102', '低速轴轴承座', '振动通频值近1小时持续上升18%，早期磨损迹象，建议关注。', 'warning');
+    addEarlyWarning('主风机电机 #M-102', '非驱动端水平', '2X频率分量近30分钟异常波动，可能存在初期的松动或不对中。', 'warning');
+    setInterval(updateMonitorLive, 3000);
+    updateMonitorLive();
+}
+
 // ===== 初始化 =====
 renderTable();
 drawSpectrum('motor_unbalance');
+startMonitorLoop();
 </script>
 </body>
 </html>
