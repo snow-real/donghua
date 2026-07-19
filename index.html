@@ -70,7 +70,27 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 .status-dot.warning { background:#F97316; }
 .status-dot.offline { background:#ef4444; }
 
-/* Modal */
+/* Tree */
+.measurements-layout { display:flex; gap:20px; }
+.tree-panel { width:280px; min-width:280px; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:20px; align-self:flex-start; }
+.tree-panel h3 { font-size:15px; font-weight:700; color:#1A3A5C; margin-bottom:15px; padding-bottom:12px; border-bottom:2px solid #f1f5f9; }
+.tree-search { width:100%; padding:8px 12px; font-size:12px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:15px; outline:none; }
+.tree-search:focus { border-color:#1A3A5C; }
+.tree-node { user-select:none; }
+.tree-label { display:flex; align-items:center; gap:6px; padding:7px 8px; border-radius:6px; cursor:pointer; font-size:13px; color:#475569; transition:all 0.2s; margin:1px 0; }
+.tree-label:hover { background:#f1f5f9; }
+.tree-label.active { background:#1A3A5C; color:white; }
+.tree-caret { width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:10px; transition:transform 0.2s; flex-shrink:0; }
+.tree-caret.open { transform:rotate(90deg); }
+.tree-caret.hidden { visibility:hidden; }
+.tree-icon { font-size:14px; width:16px; text-align:center; flex-shrink:0; }
+.tree-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tree-count { font-size:10px; background:#f1f5f9; color:#64748b; padding:1px 7px; border-radius:8px; }
+.tree-label.active .tree-count { background:rgba(255,255,255,0.25); color:white; }
+.tree-children { margin-left:16px; overflow:hidden; transition:max-height 0.3s; }
+.tree-children.collapsed { max-height:0; }
+
+.measures-right { flex:1; min-width:0; }
 .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; justify-content:center; align-items:center; }
 .modal-overlay.show { display:flex; }
 .modal { background:white; border-radius:14px; padding:30px; width:520px; max-width:90vw; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideUp 0.3s; }
@@ -273,18 +293,25 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 
     <!-- ===== 测点管理 ===== -->
     <div id="measurements" class="page">
-        <div class="measurements-header">
-            <h2 style="font-size:20px;font-weight:700;color:#1A3A5C;">测点管理</h2>
-            <button class="btn-primary" onclick="openModal('add')">+ 新增测点</button>
+        <div class="measurements-layout">
+            <div class="tree-panel" id="tree-panel">
+                <h3>📂 工厂设备结构</h3>
+                <input class="tree-search" id="tree-search" type="text" placeholder="搜索设备..." oninput="filterTree()"/>
+                <div id="tree-container"></div>
+            </div>
+            <div class="measures-right">
+                <div class="measurements-header">
+                    <h2 style="font-size:20px;font-weight:700;color:#1A3A5C;">测点管理</h2>
+                    <button class="btn-primary" onclick="openModal('add')">+ 新增测点</button>
+                </div>
+                <table class="measurements-table">
+                    <thead>
+                        <tr><th>测点编号</th><th>设备名称</th><th>测点位置</th><th>测量类型</th><th>采样频率</th><th>当前状态</th><th>最后采集时间</th><th>健康状态</th><th>操作</th></tr>
+                    </thead>
+                    <tbody id="mp-body"></tbody>
+                </table>
+            </div>
         </div>
-        <table class="measurements-table" id="measurements-tbody">
-            <thead>
-                <tr>
-                    <th>测点编号</th><th>设备名称</th><th>测点位置</th><th>测量类型</th><th>采样频率</th><th>当前状态</th><th>最后采集时间</th><th>健康状态</th><th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="mp-body"></tbody>
-        </table>
     </div>
 
     <!-- ===== 故障诊断 ===== -->
@@ -625,22 +652,47 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 <script>
 // ===== 测点数据 =====
 var measurePoints = [
-    { id:'M-102-01', device:'主风机电机 #M-102', position:'驱动端水平', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00' },
-    { id:'M-102-02', device:'主风机电机 #M-102', position:'驱动端垂直', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00' },
-    { id:'M-102-03', device:'主风机电机 #M-102', position:'非驱动端水平', type:'振动', freq:'5120 Hz', status:'warning', statusText:'预警', health:'attention', healthText:'关注', time:'2024-01-15 14:25:00' },
-    { id:'G-102-01', device:'三级减速箱 #G-102', position:'高速轴轴承座', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00' },
-    { id:'G-102-02', device:'三级减速箱 #G-102', position:'中间轴轴承座', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00' },
-    { id:'G-102-03', device:'三级减速箱 #G-102', position:'低速轴轴承座', type:'振动', freq:'5120 Hz', status:'warning', statusText:'预警', health:'attention', healthText:'关注', time:'2024-01-15 14:28:00' }
+    // 电机区 - 主风机电机 M-102
+    { id:'M-102-01', device:'主风机电机 #M-102', position:'驱动端水平', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'motor_m102' },
+    { id:'M-102-02', device:'主风机电机 #M-102', position:'驱动端垂直', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'motor_m102' },
+    { id:'M-102-03', device:'主风机电机 #M-102', position:'非驱动端水平', type:'振动', freq:'5120 Hz', status:'warning', statusText:'预警', health:'attention', healthText:'关注', time:'2024-01-15 14:25:00', treeKey:'motor_m102' },
+    // 减速箱区 - 三级减速箱 G-102
+    { id:'G-102-01', device:'三级减速箱 #G-102', position:'高速轴轴承座', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'gearbox_g102' },
+    { id:'G-102-02', device:'三级减速箱 #G-102', position:'中间轴轴承座', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'gearbox_g102' },
+    { id:'G-102-03', device:'三级减速箱 #G-102', position:'低速轴轴承座', type:'振动', freq:'5120 Hz', status:'warning', statusText:'预警', health:'attention', healthText:'关注', time:'2024-01-15 14:28:00', treeKey:'gearbox_g102' },
+    // 反应釜区
+    { id:'R-201-01', device:'加氢反应釜 #R-201', position:'搅拌电机驱动端水平', type:'振动', freq:'2560 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'reactor_r201' },
+    { id:'R-201-02', device:'加氢反应釜 #R-201', position:'搅拌电机驱动端垂直', type:'振动', freq:'2560 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'reactor_r201' },
+    { id:'R-201-03', device:'加氢反应釜 #R-201', position:'底部轴承座', type:'振动', freq:'2560 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:28:00', treeKey:'reactor_r201' },
+    // 泵区
+    { id:'P-101-01', device:'进料泵 #P-101', position:'驱动端水平', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'pump_p101' },
+    { id:'P-101-02', device:'进料泵 #P-101', position:'驱动端垂直', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'pump_p101' },
+    { id:'P-102-01', device:'循环泵 #P-102', position:'驱动端水平', type:'振动', freq:'5120 Hz', status:'warning', statusText:'预警', health:'attention', healthText:'关注', time:'2024-01-15 14:20:00', treeKey:'pump_p102' },
+    { id:'P-102-02', device:'循环泵 #P-102', position:'非驱动端水平', type:'振动', freq:'5120 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'pump_p102' },
+    // 压缩机区
+    { id:'C-301-01', device:'离心压缩机 #C-301', position:'驱动端水平', type:'振动', freq:'10240 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'compressor_c301' },
+    { id:'C-301-02', device:'离心压缩机 #C-301', position:'驱动端垂直', type:'振动', freq:'10240 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'compressor_c301' },
+    { id:'C-301-03', device:'离心压缩机 #C-301', position:'非驱动端水平', type:'振动', freq:'10240 Hz', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'compressor_c301' },
+    { id:'C-301-04', device:'离心压缩机 #C-301', position:'齿轮箱高速轴', type:'振动', freq:'10240 Hz', status:'offline', statusText:'离线', health:'abnormal', healthText:'异常', time:'2024-01-15 12:00:00', treeKey:'compressor_c301' },
+    // 风机区
+    { id:'F-103-01', device:'引风机 #F-103', position:'驱动端水平', type:'振动', freq:'5120 Hz', status:'offline', statusText:'离线', health:'abnormal', healthText:'异常', time:'2024-01-15 10:15:00', treeKey:'fan_f103' },
+    { id:'F-103-02', device:'引风机 #F-103', position:'驱动端垂直', type:'振动', freq:'5120 Hz', status:'offline', statusText:'离线', health:'abnormal', healthText:'异常', time:'2024-01-15 10:15:00', treeKey:'fan_f103' },
+    // 换热器区
+    { id:'E-401-01', device:'管壳式换热器 #E-401', position:'入口法兰', type:'温度', freq:'--', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'exchanger_e401' },
+    { id:'E-401-02', device:'管壳式换热器 #E-401', position:'出口法兰', type:'温度', freq:'--', status:'online', statusText:'在线', health:'good', healthText:'良好', time:'2024-01-15 14:30:00', treeKey:'exchanger_e401' }
 ];
 
 var healthColorMap = { good:'#22c55e', attention:'#F97316', abnormal:'#ef4444' };
 var statusClassMap = { online:'online', warning:'warning', offline:'offline' };
+
+var currentFilter = null;
 
 function renderTable() {
     var tbody = document.getElementById('mp-body');
     var html = '';
     for (var i = 0; i < measurePoints.length; i++) {
         var mp = measurePoints[i];
+        if (currentFilter && mp.treeKey && mp.treeKey !== currentFilter) { continue; }
         html += '<tr>'+
             '<td style="font-weight:600;color:#1A3A5C;">'+mp.id+'</td>'+
             '<td>'+mp.device+'</td>'+
@@ -653,7 +705,7 @@ function renderTable() {
             '<td><button class="btn-edit" onclick="editPoint('+i+')">编辑</button><button class="btn-delete" onclick="deletePoint('+i+')">删除</button></td>'+
             '</tr>';
     }
-    tbody.innerHTML = html;
+    tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;padding:30px;color:#94a3b8;">暂无匹配的测点数据</td></tr>';
 }
 
 function openModal(mode, idx) {
@@ -1028,8 +1080,133 @@ function startMonitorLoop() {
     updateMonitorLive();
 }
 
+// ===== 树状结构 =====
+var treeData = [
+    { id:'all', name:'全部设备', icon:'🏭', key:null, children:[
+        { id:'motor_m102', name:'主风机电机 #M-102', icon:'⚡', key:'motor_m102', children:[] },
+        { id:'gearbox_g102', name:'三级减速箱 #G-102', icon:'⚙', key:'gearbox_g102', children:[] },
+        { id:'reactor_r201', name:'加氢反应釜 #R-201', icon:'🧪', key:'reactor_r201', children:[] },
+        { id:'pump_p101', name:'进料泵 #P-101', icon:'💧', key:'pump_p101', children:[] },
+        { id:'pump_p102', name:'循环泵 #P-102', icon:'💧', key:'pump_p102', children:[] },
+        { id:'compressor_c301', name:'离心压缩机 #C-301', icon:'🌀', key:'compressor_c301', children:[] },
+        { id:'fan_f103', name:'引风机 #F-103', icon:'🌬', key:'fan_f103', children:[] },
+        { id:'exchanger_e401', name:'管壳式换热器 #E-401', icon:'🔥', key:'exchanger_e401', children:[] }
+    ]}
+];
+
+function countPointsByKey(key) {
+    if (!key) return measurePoints.length;
+    var count = 0;
+    for (var i = 0; i < measurePoints.length; i++) {
+        if (measurePoints[i].treeKey === key) count++;
+    }
+    return count;
+}
+
+function renderTree(nodes, container, level) {
+    level = level || 0;
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        var hasChildren = node.children && node.children.length > 0;
+        var count = countPointsByKey(node.key);
+        var wrapper = document.createElement('div');
+        wrapper.className = 'tree-node';
+
+        var label = document.createElement('div');
+        label.className = 'tree-label';
+        if (currentFilter === node.key) label.classList.add('active');
+        label.setAttribute('data-key', node.key || 'all');
+        label.setAttribute('data-name', node.name);
+        label.onclick = function(e) { e.stopPropagation(); treeClick(this.getAttribute('data-key'), this.getAttribute('data-name')); };
+
+        var caret = document.createElement('span');
+        caret.className = 'tree-caret';
+        if (!hasChildren) { caret.classList.add('hidden'); }
+        else { caret.textContent = '▶'; }
+        if (hasChildren && !wrapper.querySelector('.tree-children.collapsed')) { caret.classList.add('open'); }
+
+        var icon = document.createElement('span');
+        icon.className = 'tree-icon';
+        icon.textContent = node.icon;
+
+        var name = document.createElement('span');
+        name.className = 'tree-name';
+        name.textContent = node.name;
+
+        var badge = document.createElement('span');
+        badge.className = 'tree-count';
+        badge.textContent = count;
+
+        label.appendChild(caret);
+        label.appendChild(icon);
+        label.appendChild(name);
+        label.appendChild(badge);
+        wrapper.appendChild(label);
+
+        if (hasChildren) {
+            var childrenDiv = document.createElement('div');
+            childrenDiv.className = 'tree-children';
+            renderTree(node.children, childrenDiv, level + 1);
+            wrapper.appendChild(childrenDiv);
+
+            caret.onclick = function(e) {
+                e.stopPropagation();
+                var childrenDiv2 = this.parentElement.parentElement.querySelector('.tree-children');
+                if (childrenDiv2) {
+                    childrenDiv2.classList.toggle('collapsed');
+                    this.classList.toggle('open');
+                }
+            };
+        }
+        container.appendChild(wrapper);
+    }
+}
+
+function treeClick(key, name) {
+    currentFilter = key;
+    renderTable();
+
+    var labels = document.querySelectorAll('.tree-label');
+    for (var i = 0; i < labels.length; i++) {
+        labels[i].classList.remove('active');
+        if (labels[i].getAttribute('data-key') === key) {
+            labels[i].classList.add('active');
+        }
+    }
+
+    document.querySelector('.measures-right .measurements-header h2').textContent = currentFilter ? '测点管理 - ' + name : '测点管理';
+}
+
+function filterTree() {
+    var search = document.getElementById('tree-search').value.toLowerCase();
+    var labels = document.querySelectorAll('.tree-label');
+    for (var i = 0; i < labels.length; i++) {
+        var name = labels[i].getAttribute('data-name').toLowerCase();
+        var wrapper = labels[i].parentElement;
+        var hasMatch = name.indexOf(search) !== -1;
+        wrapper.style.display = hasMatch ? '' : 'none';
+        // Show parent chain
+        if (hasMatch && search) {
+            var p = wrapper.parentElement;
+            while (p && p.classList && p.classList.contains('tree-children')) {
+                p.classList.remove('collapsed');
+                var parentLabel = p.parentElement.querySelector('.tree-caret');
+                if (parentLabel) parentLabel.classList.add('open');
+                p = p.parentElement.parentElement;
+            }
+        }
+    }
+}
+
+function refreshTree() {
+    var container = document.getElementById('tree-container');
+    container.innerHTML = '';
+    renderTree(treeData, container);
+}
+
 // ===== 初始化 =====
 renderTable();
+refreshTree();
 drawSpectrum('motor_unbalance');
 startMonitorLoop();
 </script>
