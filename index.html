@@ -33,12 +33,8 @@
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.3s;
-            position: relative;
         }
-        .nav-item.active {
-            background: #1A3A5C;
-            color: white;
-        }
+        .nav-item.active { background: #1A3A5C; color: white; }
         .nav-item:hover { background: #f1f5f9; }
         .nav-item.active:hover { background: #1A3A5C; }
         .header-right { text-align: right; }
@@ -110,7 +106,25 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-        .selector-title { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 15px; }
+        .selector-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .selector-title { font-size: 14px; font-weight: 600; color: #475569; }
+        .device-tabs { display: flex; gap: 10px; }
+        .device-tab {
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .device-tab.active {
+            background: #1A3A5C;
+            color: white;
+            border-color: #1A3A5C;
+        }
         .fault-tags { display: flex; flex-wrap: wrap; gap: 10px; }
         .fault-tag {
             padding: 8px 16px;
@@ -153,18 +167,19 @@
         .bar-fill.peak { fill: #F97316; }
         .bar-fill.critical { fill: #ef4444; }
 
-        .knowledge-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .knowledge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .knowledge-card {
             background: white;
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-        .knowledge-title { font-size: 16px; font-weight: 600; color: #1A3A5C; margin-bottom: 15px; }
-        .knowledge-desc { font-size: 13px; color: #64748b; line-height: 1.7; margin-bottom: 15px; }
+        .knowledge-category { font-size: 11px; font-weight: 600; color: #F97316; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .knowledge-title { font-size: 16px; font-weight: 600; color: #1A3A5C; margin-bottom: 12px; }
+        .knowledge-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 12px; }
         .knowledge-table { font-size: 12px; }
-        .knowledge-table td { padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
-        .knowledge-table .key { font-weight: 600; color: #475569; width: 120px; }
+        .knowledge-table td { padding: 5px 0; border-bottom: 1px solid #f1f5f9; }
+        .knowledge-table .key { font-weight: 600; color: #475569; width: 100px; }
 
         .measurement-form {
             background: white;
@@ -278,7 +293,7 @@
                                 <tbody>
                                     <tr><td>14:32:18</td><td>主风机 #M-102</td><td>轴承内圈故障</td><td><span class="badge warning">中等</span></td></tr>
                                     <tr><td>13:15:42</td><td>输送风机 #F-402</td><td>不平衡</td><td><span class="badge critical">严重</span></td></tr>
-                                    <tr><td>10:08:33</td><td>主风机 #M-102</td><td>不对中</td><td><span class="badge warning">中等</span></td></tr>
+                                    <tr><td>10:08:33</td><td>三级减速箱 #G-102</td><td>齿形误差</td><td><span class="badge warning">中等</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -323,21 +338,40 @@
 
             <div id="diagnosis" class="page">
                 <div class="fault-selector">
-                    <div class="selector-title">选择故障类型查看频谱特征</div>
-                    <div class="fault-tags">
-                        <div class="fault-tag active" data-fault="unbalance">不平衡</div>
-                        <div class="fault-tag" data-fault="bearing">轴承故障</div>
-                        <div class="fault-tag" data-fault="misalignment">不对中</div>
-                        <div class="fault-tag" data-fault="rubbing">动静件碰摩</div>
-                        <div class="fault-tag" data-fault="loose">部件松动</div>
-                        <div class="fault-tag" data-fault="foundation">地脚/垫铁松动</div>
-                        <div class="fault-tag" data-fault="combined">不平衡+不对中</div>
+                    <div class="selector-header">
+                        <div class="selector-title">选择设备类型及故障类型查看频谱特征</div>
+                        <div class="device-tabs">
+                            <div class="device-tab active" data-device="motor">电机故障</div>
+                            <div class="device-tab" data-device="gearbox">齿轮箱故障</div>
+                        </div>
+                    </div>
+                    <div class="fault-tags" id="motor-faults">
+                        <div class="fault-tag active" data-fault="motor_unbalance">不平衡</div>
+                        <div class="fault-tag" data-fault="motor_bearing">轴承故障</div>
+                        <div class="fault-tag" data-fault="motor_misalignment">不对中</div>
+                        <div class="fault-tag" data-fault="motor_rubbing">动静件碰摩</div>
+                        <div class="fault-tag" data-fault="motor_loose">部件松动</div>
+                        <div class="fault-tag" data-fault="motor_foundation">地脚/垫铁松动</div>
+                        <div class="fault-tag" data-fault="motor_combined">不平衡+不对中</div>
+                    </div>
+                    <div class="fault-tags" id="gearbox-faults" style="display: none;">
+                        <div class="fault-tag" data-fault="gear_tooth_error">齿形误差</div>
+                        <div class="fault-tag" data-fault="gear_wear">齿轮均匀磨损</div>
+                        <div class="fault-tag" data-fault="gear_misalignment">轴不对中</div>
+                        <div class="fault-tag" data-fault="gear_broken">断齿</div>
+                        <div class="fault-tag" data-fault="gear_resonance">箱体共振</div>
+                        <div class="fault-tag" data-fault="gear_shaft_bend_light">轴轻度弯曲</div>
+                        <div class="fault-tag" data-fault="gear_shaft_bend_heavy">轴严重弯曲</div>
+                        <div class="fault-tag" data-fault="gear_shaft_unbalance">轴不平衡</div>
+                        <div class="fault-tag" data-fault="gear_shaft_axial">轴向窜动</div>
+                        <div class="fault-tag" data-fault="gear_bearing_spalling">轴承疲劳剥落</div>
+                        <div class="fault-tag" data-fault="gear_bearing_pitting">轴承点蚀</div>
                     </div>
                 </div>
 
                 <div class="diagnosis-layout">
                     <div class="motor-container">
-                        <div class="motor-title">电机 + 三级减速箱模型</div>
+                        <div class="motor-title" id="model-title">电机 + 三级减速箱模型</div>
                         <svg class="motor-svg" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
                             <rect x="40" y="80" width="180" height="90" rx="10" fill="#3b82f6" opacity="0.9"/>
                             <rect x="50" y="90" width="160" height="70" fill="#1d4ed8" opacity="0.6"/>
@@ -402,11 +436,11 @@
                         <div class="spectrum-info">
                             <div class="info-item">
                                 <div class="info-label">设备名称</div>
-                                <div class="info-value">主风机电机 #M-102</div>
+                                <div class="info-value" id="spectrum-device">主风机电机 #M-102</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">测点位置</div>
-                                <div class="info-value">驱动端水平</div>
+                                <div class="info-value" id="spectrum-position">驱动端水平</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">采样频率</div>
@@ -453,73 +487,173 @@
             <div id="knowledge" class="page">
                 <div class="knowledge-grid">
                     <div class="knowledge-card">
+                        <div class="knowledge-category">电机故障</div>
                         <div class="knowledge-title">不平衡</div>
-                        <div class="knowledge-desc">旋转机械最常见的故障，由于转子质心与旋转中心不重合导致。表现为工频(1X)分量显著增大，伴随2X分量轻微增加。</div>
+                        <div class="knowledge-desc">旋转机械最常见的故障，由于转子质心与旋转中心不重合导致。表现为工频(1X)分量显著增大。</div>
                         <table class="knowledge-table">
                             <tr><td class="key">频率特征</td><td>1X主频突出，2X微弱</td></tr>
-                            <tr><td class="key">振动方向</td><td>径向为主，水平/垂直接近</td></tr>
-                            <tr><td class="key">相位特征</td><td>稳定，重复性好</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
                             <tr><td class="key">典型原因</td><td>叶轮积灰、零件脱落</td></tr>
                         </table>
                     </div>
                     <div class="knowledge-card">
+                        <div class="knowledge-category">电机故障</div>
                         <div class="knowledge-title">轴承故障</div>
-                        <div class="knowledge-desc">滚动轴承的内外圈、滚动体或保持架损伤。频谱中出现特征故障频率及其倍频，常伴随边频带。</div>
+                        <div class="knowledge-desc">滚动轴承的内外圈、滚动体或保持架损伤。频谱中出现特征故障频率及其倍频。</div>
                         <table class="knowledge-table">
                             <tr><td class="key">频率特征</td><td>BPFI/BPFO/BSF/FTF</td></tr>
                             <tr><td class="key">振动方向</td><td>径向振动为主</td></tr>
-                            <tr><td class="key">相位特征</td><td>不稳定，随故障发展变化</td></tr>
                             <tr><td class="key">典型原因</td><td>疲劳剥落、润滑不良</td></tr>
                         </table>
                     </div>
                     <div class="knowledge-card">
+                        <div class="knowledge-category">电机故障</div>
                         <div class="knowledge-title">不对中</div>
-                        <div class="knowledge-desc">两轴中心线不重合，分为平行不对中和角度不对中。频谱中2X分量显著增大，3X及高次谐波也较明显。</div>
+                        <div class="knowledge-desc">两轴中心线不重合。频谱中2X分量显著增大，3X及高次谐波也较明显。</div>
                         <table class="knowledge-table">
                             <tr><td class="key">频率特征</td><td>2X为主，3X、4X较高</td></tr>
                             <tr><td class="key">振动方向</td><td>轴向振动显著</td></tr>
-                            <tr><td class="key">相位特征</td><td>水平/垂直相位差90°</td></tr>
                             <tr><td class="key">典型原因</td><td>安装误差、热变形</td></tr>
                         </table>
                     </div>
                     <div class="knowledge-card">
+                        <div class="knowledge-category">电机故障</div>
                         <div class="knowledge-title">动静件碰摩</div>
-                        <div class="knowledge-desc">旋转部件与静止部件接触摩擦。频谱特征复杂，包含丰富的谐波分量和非整数倍频率。</div>
+                        <div class="knowledge-desc">旋转部件与静止部件接触摩擦。频谱特征复杂，包含丰富的谐波分量。</div>
                         <table class="knowledge-table">
                             <tr><td class="key">频率特征</td><td>丰富谐波，非整数倍频</td></tr>
                             <tr><td class="key">振动方向</td><td>各方向均有</td></tr>
-                            <tr><td class="key">相位特征</td><td>不稳定，随机性强</td></tr>
                             <tr><td class="key">典型原因</td><td>间隙过小、转子弯曲</td></tr>
                         </table>
                     </div>
                     <div class="knowledge-card">
+                        <div class="knowledge-category">电机故障</div>
                         <div class="knowledge-title">部件松动</div>
                         <div class="knowledge-desc">零部件之间的连接松动，导致刚度变化。频谱中出现1/2X、1/3X等分频分量。</div>
                         <table class="knowledge-table">
                             <tr><td class="key">频率特征</td><td>分频(1/2X, 1/3X)明显</td></tr>
                             <tr><td class="key">振动方向</td><td>各方向均有</td></tr>
-                            <tr><td class="key">相位特征</td><td>不稳定</td></tr>
                             <tr><td class="key">典型原因</td><td>螺栓松动、键销损坏</td></tr>
                         </table>
                     </div>
                     <div class="knowledge-card">
+                        <div class="knowledge-category">电机故障</div>
                         <div class="knowledge-title">地脚/垫铁松动</div>
-                        <div class="knowledge-desc">设备基础与地面连接松动，影响整体刚性。低频振动增大，频谱中1X、2X、3X均较显著。</div>
+                        <div class="knowledge-desc">设备基础与地面连接松动，影响整体刚性。低频振动增大。</div>
                         <table class="knowledge-table">
                             <tr><td class="key">频率特征</td><td>1X、2X、3X均高</td></tr>
                             <tr><td class="key">振动方向</td><td>垂直方向显著</td></tr>
-                            <tr><td class="key">相位特征</td><td>不稳定</td></tr>
                             <tr><td class="key">典型原因</td><td>基础沉降、垫铁失效</td></tr>
                         </table>
                     </div>
                     <div class="knowledge-card">
-                        <div class="knowledge-title">不平衡+不对中（复合故障）</div>
-                        <div class="knowledge-desc">两种故障同时存在，频谱表现为1X和2X分量均显著增大，需要综合分析判断。</div>
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">齿形误差</div>
+                        <div class="knowledge-desc">齿轮齿面几何形状偏差，导致啮合冲击。频谱中啮合频率及其倍频增大。</div>
                         <table class="knowledge-table">
-                            <tr><td class="key">频率特征</td><td>1X和2X均突出</td></tr>
-                            <tr><td class="key">振动方向</td><td>径向和轴向均显著</td></tr>
-                            <tr><td class="key">相位特征</td><td>水平/垂直有特定关系</td></tr>
-                            <tr><td class="key">典型原因</td><td>长期运行累积偏差</td></tr>
+                            <tr><td class="key">频率特征</td><td>啮合频率及其倍频增大</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>制造精度不足</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">齿轮均匀磨损</div>
+                        <div class="knowledge-desc">齿轮表面均匀磨损导致侧隙增大，冲击振动加剧。啮合频率两侧边频带加宽。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>边频带加宽，幅值增大</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>润滑不良、长期运行</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴不对中</div>
+                        <div class="knowledge-desc">输入输出轴中心线不重合。2X分量显著，轴向振动明显。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>2X为主，轴向振动显著</td></tr>
+                            <tr><td class="key">振动方向</td><td>轴向明显</td></tr>
+                            <tr><td class="key">典型原因</td><td>安装偏差、热膨胀</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">断齿</div>
+                        <div class="knowledge-desc">齿轮齿断裂，导致周期性冲击。频谱中出现明显的转频及其谐波。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>转频及谐波显著，冲击脉冲</td></tr>
+                            <tr><td class="key">振动方向</td><td>各方向强烈</td></tr>
+                            <tr><td class="key">典型原因</td><td>过载、疲劳、材质缺陷</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">箱体共振</div>
+                        <div class="knowledge-desc">箱体固有频率与激振频率重合，导致振动急剧增大。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>特定频率处峰值突增</td></tr>
+                            <tr><td class="key">振动方向</td><td>箱体整体振动</td></tr>
+                            <tr><td class="key">典型原因</td><td>箱体刚度不足</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴轻度弯曲</div>
+                        <div class="knowledge-desc">轴发生轻微弯曲变形。1X和2X分量增大，振动随转速变化。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>1X、2X增大</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>装配不当、热变形</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴严重弯曲</div>
+                        <div class="knowledge-desc">轴发生严重弯曲，振动剧烈。1X、2X、3X均显著增大。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>1X、2X、3X均显著</td></tr>
+                            <tr><td class="key">振动方向</td><td>各方向强烈</td></tr>
+                            <tr><td class="key">典型原因</td><td>过载、碰撞事故</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴不平衡</div>
+                        <div class="knowledge-desc">轴系质心偏移。1X分量显著，振动随转速平方增大。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>1X主频突出</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>零件偏心、装配误差</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴向窜动</div>
+                        <div class="knowledge-desc">轴沿轴向方向的往复运动。轴向振动显著，出现转频及谐波。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>转频及谐波，轴向明显</td></tr>
+                            <tr><td class="key">振动方向</td><td>轴向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>轴承游隙过大、定位失效</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴承疲劳剥落</div>
+                        <div class="knowledge-desc">轴承滚动表面疲劳产生剥落坑。频谱中出现轴承特征频率及其边频带。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>BPFI/BPFO及其边频带</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>疲劳损伤、润滑不良</td></tr>
+                        </table>
+                    </div>
+                    <div class="knowledge-card">
+                        <div class="knowledge-category">齿轮箱故障</div>
+                        <div class="knowledge-title">轴承点蚀</div>
+                        <div class="knowledge-desc">轴承表面产生微小腐蚀点。频谱中出现密集的边频带和噪声。</div>
+                        <table class="knowledge-table">
+                            <tr><td class="key">频率特征</td><td>密集边频带，噪声底抬高</td></tr>
+                            <tr><td class="key">振动方向</td><td>径向为主</td></tr>
+                            <tr><td class="key">典型原因</td><td>电蚀、润滑剂污染</td></tr>
                         </table>
                     </div>
                 </div>
@@ -541,107 +675,227 @@
             });
         });
 
+        const deviceTabs = document.querySelectorAll('.device-tab');
+        const motorFaults = document.getElementById('motor-faults');
+        const gearboxFaults = document.getElementById('gearbox-faults');
         const faultTags = document.querySelectorAll('.fault-tag');
         const spectrumBars = document.getElementById('spectrum-bars');
+        const spectrumDevice = document.getElementById('spectrum-device');
+        const spectrumPosition = document.getElementById('spectrum-position');
 
         const faultData = {
-            unbalance: {
+            motor_unbalance: {
                 name: '不平衡',
-                description: '工频(1X)分量显著增大，2X分量轻微增加',
-                peaks: [50, 100, 150, 200, 250, 300, 350, 400, 450, 500],
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
+                peaks: [50, 100, 150, 200, 250, 300],
                 values: [0.1, 0.85, 0.15, 0.92, 0.12, 0.88, 0.1, 0.82, 0.08, 0.75, 0.06, 0.68, 0.05, 0.62, 0.04, 0.55, 0.03, 0.48, 0.02, 0.4, 0.02, 0.35, 0.01, 0.3, 0.01, 0.25, 0.01, 0.2, 0.01, 0.15, 0.01, 0.12, 0.01, 0.1, 0.01, 0.08, 0.01, 0.06, 0.01, 0.05, 0.01, 0.04, 0.01, 0.03, 0.01, 0.02, 0.01, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
                 criticalPeaks: [100, 200, 300]
             },
-            bearing: {
+            motor_bearing: {
                 name: '轴承故障',
-                description: '特征故障频率及其倍频，伴随边频带',
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
                 peaks: [230, 460, 690, 920, 1150],
                 values: [0.05, 0.08, 0.06, 0.72, 0.05, 0.09, 0.04, 0.68, 0.03, 0.08, 0.02, 0.62, 0.02, 0.07, 0.01, 0.55, 0.01, 0.06, 0.01, 0.48, 0.01, 0.05, 0.01, 0.42, 0.01, 0.04, 0.01, 0.35, 0.01, 0.03, 0.01, 0.3, 0.01, 0.02, 0.01, 0.25, 0.01, 0.02, 0.01, 0.2, 0.01, 0.01, 0.01, 0.15, 0.01, 0.01, 0.01, 0.12, 0.01, 0.01, 0.01, 0.1, 0.01, 0.01, 0.01, 0.08, 0.01, 0.01, 0.01, 0.06],
                 criticalPeaks: [230, 460, 690]
             },
-            misalignment: {
+            motor_misalignment: {
                 name: '不对中',
-                description: '2X分量显著增大，3X及高次谐波较明显',
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
                 peaks: [50, 100, 150, 200, 250, 300, 350, 400],
                 values: [0.15, 0.5, 0.12, 0.85, 0.1, 0.45, 0.08, 0.78, 0.06, 0.4, 0.05, 0.72, 0.04, 0.35, 0.03, 0.65, 0.02, 0.3, 0.02, 0.58, 0.01, 0.25, 0.01, 0.5, 0.01, 0.2, 0.01, 0.45, 0.01, 0.15, 0.01, 0.4, 0.01, 0.12, 0.01, 0.35, 0.01, 0.1, 0.01, 0.3, 0.01, 0.08, 0.01, 0.25, 0.01, 0.06, 0.01, 0.2, 0.01, 0.05, 0.01, 0.15],
                 criticalPeaks: [100, 200, 300, 400]
             },
-            rubbing: {
+            motor_rubbing: {
                 name: '动静件碰摩',
-                description: '丰富谐波分量和非整数倍频率',
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
                 peaks: [40, 80, 120, 160, 200, 240, 280, 320],
                 values: [0.08, 0.35, 0.06, 0.42, 0.05, 0.38, 0.04, 0.45, 0.03, 0.32, 0.03, 0.38, 0.02, 0.28, 0.02, 0.34, 0.01, 0.25, 0.01, 0.3, 0.01, 0.22, 0.01, 0.26, 0.01, 0.2, 0.01, 0.23, 0.01, 0.18, 0.01, 0.2, 0.01, 0.15, 0.01, 0.17, 0.01, 0.13, 0.01, 0.15, 0.01, 0.11, 0.01, 0.13, 0.01, 0.1, 0.01, 0.11, 0.01, 0.08],
                 criticalPeaks: [80, 160, 240]
             },
-            loose: {
+            motor_loose: {
                 name: '部件松动',
-                description: '出现1/2X、1/3X等分频分量',
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
                 peaks: [25, 50, 75, 100, 125, 150, 175, 200],
                 values: [0.2, 0.55, 0.15, 0.45, 0.12, 0.38, 0.1, 0.65, 0.08, 0.32, 0.06, 0.28, 0.05, 0.55, 0.04, 0.25, 0.03, 0.22, 0.02, 0.48, 0.02, 0.2, 0.01, 0.18, 0.01, 0.42, 0.01, 0.16, 0.01, 0.15, 0.01, 0.38, 0.01, 0.14, 0.01, 0.13, 0.01, 0.35, 0.01, 0.12, 0.01, 0.11, 0.01, 0.32, 0.01, 0.1, 0.01, 0.09],
                 criticalPeaks: [25, 75, 125, 175]
             },
-            foundation: {
+            motor_foundation: {
                 name: '地脚/垫铁松动',
-                description: '低频振动增大，1X、2X、3X均较显著',
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
                 peaks: [50, 100, 150, 200, 250, 300],
                 values: [0.18, 0.65, 0.15, 0.72, 0.12, 0.68, 0.1, 0.62, 0.08, 0.58, 0.06, 0.52, 0.05, 0.48, 0.04, 0.42, 0.03, 0.38, 0.02, 0.34, 0.02, 0.3, 0.01, 0.26, 0.01, 0.22, 0.01, 0.18, 0.01, 0.15, 0.01, 0.12, 0.01, 0.1, 0.01, 0.08, 0.01, 0.06, 0.01, 0.05, 0.01, 0.04, 0.01, 0.03, 0.01, 0.02, 0.01, 0.02, 0.01, 0.01],
                 criticalPeaks: [50, 100, 150]
             },
-            combined: {
+            motor_combined: {
                 name: '不平衡+不对中',
-                description: '1X和2X分量均显著增大',
+                device: '主风机电机 #M-102',
+                position: '驱动端水平',
                 peaks: [50, 100, 150, 200, 250, 300, 350, 400],
                 values: [0.15, 0.75, 0.12, 0.88, 0.1, 0.68, 0.08, 0.82, 0.06, 0.62, 0.05, 0.76, 0.04, 0.56, 0.03, 0.7, 0.02, 0.5, 0.02, 0.65, 0.01, 0.45, 0.01, 0.58, 0.01, 0.4, 0.01, 0.52, 0.01, 0.35, 0.01, 0.48, 0.01, 0.32, 0.01, 0.42, 0.01, 0.28, 0.01, 0.38, 0.01, 0.25, 0.01, 0.35, 0.01, 0.22, 0.01, 0.3, 0.01, 0.2],
                 criticalPeaks: [50, 100, 200, 300]
+            },
+            gear_tooth_error: {
+                name: '齿形误差',
+                device: '三级减速箱 #G-102',
+                position: '高速轴端',
+                peaks: [180, 360, 540, 720, 900],
+                values: [0.05, 0.08, 0.06, 0.75, 0.05, 0.09, 0.04, 0.7, 0.03, 0.08, 0.02, 0.65, 0.02, 0.07, 0.01, 0.58, 0.01, 0.06, 0.01, 0.52, 0.01, 0.05, 0.01, 0.45, 0.01, 0.04, 0.01, 0.38, 0.01, 0.03, 0.01, 0.32, 0.01, 0.02, 0.01, 0.26, 0.01, 0.02, 0.01, 0.2, 0.01, 0.01, 0.01, 0.15],
+                criticalPeaks: [180, 360, 540]
+            },
+            gear_wear: {
+                name: '齿轮均匀磨损',
+                device: '三级减速箱 #G-102',
+                position: '高速轴端',
+                peaks: [150, 180, 210, 330, 360, 390, 510, 540, 570],
+                values: [0.08, 0.5, 0.06, 0.62, 0.05, 0.48, 0.04, 0.55, 0.03, 0.68, 0.03, 0.52, 0.02, 0.45, 0.02, 0.58, 0.01, 0.42, 0.01, 0.5, 0.01, 0.38, 0.01, 0.45, 0.01, 0.35, 0.01, 0.4, 0.01, 0.32, 0.01, 0.36, 0.01, 0.28, 0.01, 0.32, 0.01, 0.25],
+                criticalPeaks: [180, 360, 540]
+            },
+            gear_misalignment: {
+                name: '轴不对中',
+                device: '三级减速箱 #G-102',
+                position: '中间轴端',
+                peaks: [60, 120, 180, 240, 300, 360],
+                values: [0.12, 0.45, 0.1, 0.78, 0.08, 0.42, 0.06, 0.72, 0.05, 0.38, 0.04, 0.65, 0.03, 0.35, 0.02, 0.58, 0.02, 0.32, 0.01, 0.52, 0.01, 0.28, 0.01, 0.45, 0.01, 0.25, 0.01, 0.4, 0.01, 0.22, 0.01, 0.35, 0.01, 0.2, 0.01, 0.3, 0.01, 0.18, 0.01, 0.25],
+                criticalPeaks: [120, 240, 360]
+            },
+            gear_broken: {
+                name: '断齿',
+                device: '三级减速箱 #G-102',
+                position: '高速轴端',
+                peaks: [30, 60, 90, 120, 150, 180, 210, 240],
+                values: [0.25, 0.85, 0.18, 0.92, 0.15, 0.88, 0.12, 0.82, 0.1, 0.75, 0.08, 0.68, 0.06, 0.62, 0.05, 0.55, 0.04, 0.48, 0.03, 0.42, 0.02, 0.35, 0.02, 0.3, 0.01, 0.25, 0.01, 0.2, 0.01, 0.15],
+                criticalPeaks: [30, 60, 90]
+            },
+            gear_resonance: {
+                name: '箱体共振',
+                device: '三级减速箱 #G-102',
+                position: '箱体中部',
+                peaks: [420, 840],
+                values: [0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.95, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03, 0.02, 0.85, 0.02, 0.03, 0.02, 0.03, 0.02, 0.03],
+                criticalPeaks: [420]
+            },
+            gear_shaft_bend_light: {
+                name: '轴轻度弯曲',
+                device: '三级减速箱 #G-102',
+                position: '中间轴端',
+                peaks: [60, 120, 180, 240],
+                values: [0.15, 0.62, 0.12, 0.55, 0.1, 0.48, 0.08, 0.42, 0.06, 0.38, 0.05, 0.34, 0.04, 0.3, 0.03, 0.26, 0.02, 0.22, 0.02, 0.18, 0.01, 0.15, 0.01, 0.12, 0.01, 0.1, 0.01, 0.08],
+                criticalPeaks: [60, 120]
+            },
+            gear_shaft_bend_heavy: {
+                name: '轴严重弯曲',
+                device: '三级减速箱 #G-102',
+                position: '中间轴端',
+                peaks: [60, 120, 180, 240, 300, 360],
+                values: [0.22, 0.85, 0.18, 0.78, 0.15, 0.72, 0.12, 0.65, 0.1, 0.58, 0.08, 0.52, 0.06, 0.45, 0.05, 0.4, 0.04, 0.35, 0.03, 0.3, 0.02, 0.25, 0.02, 0.2, 0.01, 0.15, 0.01, 0.12],
+                criticalPeaks: [60, 120, 180]
+            },
+            gear_shaft_unbalance: {
+                name: '轴不平衡',
+                device: '三级减速箱 #G-102',
+                position: '高速轴端',
+                peaks: [30, 60, 90, 120, 150],
+                values: [0.18, 0.88, 0.12, 0.35, 0.1, 0.28, 0.08, 0.22, 0.06, 0.18, 0.05, 0.15, 0.04, 0.12, 0.03, 0.1, 0.02, 0.08, 0.02, 0.06, 0.01, 0.05, 0.01, 0.04, 0.01, 0.03],
+                criticalPeaks: [30]
+            },
+            gear_shaft_axial: {
+                name: '轴向窜动',
+                device: '三级减速箱 #G-102',
+                position: '高速轴端',
+                peaks: [30, 60, 90, 120, 150, 180],
+                values: [0.2, 0.55, 0.15, 0.48, 0.12, 0.42, 0.1, 0.38, 0.08, 0.34, 0.06, 0.3, 0.05, 0.26, 0.04, 0.22, 0.03, 0.18, 0.02, 0.15, 0.02, 0.12, 0.01, 0.1, 0.01, 0.08],
+                criticalPeaks: [30, 60]
+            },
+            gear_bearing_spalling: {
+                name: '轴承疲劳剥落',
+                device: '三级减速箱 #G-102',
+                position: '高速轴端',
+                peaks: [210, 420, 630, 840],
+                values: [0.05, 0.08, 0.06, 0.75, 0.05, 0.09, 0.04, 0.7, 0.03, 0.08, 0.02, 0.65, 0.02, 0.07, 0.01, 0.58, 0.01, 0.06, 0.01, 0.52, 0.01, 0.05, 0.01, 0.45, 0.01, 0.04, 0.01, 0.38, 0.01, 0.03, 0.01, 0.32, 0.01, 0.02, 0.01, 0.26],
+                criticalPeaks: [210, 420]
+            },
+            gear_bearing_pitting: {
+                name: '轴承点蚀',
+                device: '三级减速箱 #G-102',
+                position: '中间轴端',
+                peaks: [180, 240, 300, 360, 420, 480],
+                values: [0.08, 0.42, 0.06, 0.38, 0.05, 0.45, 0.04, 0.35, 0.03, 0.4, 0.02, 0.32, 0.02, 0.36, 0.01, 0.28, 0.01, 0.32, 0.01, 0.25, 0.01, 0.28, 0.01, 0.22, 0.01, 0.25, 0.01, 0.2, 0.01, 0.22],
+                criticalPeaks: [180, 300, 420]
             }
         };
 
-        function drawSpectrum(faultType) {
-            const data = faultData[faultType];
+        function renderSpectrum(faultKey) {
+            const data = faultData[faultKey];
+            if (!data) return;
+
+            spectrumDevice.textContent = data.device;
+            spectrumPosition.textContent = data.position;
+
             spectrumBars.innerHTML = '';
-            const totalBars = 60;
+            const bars = 60;
             const barWidth = 8;
             const gap = 2;
-            const startX = 65;
-            const baseY = 280;
-            const scale = 240;
+            const startX = 70;
+            const height = 240;
+            const maxValue = 1.0;
 
-            for (let i = 0; i < totalBars; i++) {
-                const x = startX + i * (barWidth + gap);
-                let value = data.values[i] || 0.01 + Math.random() * 0.02;
-                let className = 'bar-fill';
+            for (let i = 0; i < bars; i++) {
+                const freq = Math.round((i + 1) * 5000 / bars);
+                const value = (i < data.values.length) ? data.values[i] : 0.01 + Math.random() * 0.02;
                 
-                if (data.criticalPeaks.includes(i * 83.33)) {
+                let barHeight = (value / maxValue) * height;
+                barHeight = Math.max(2, barHeight);
+                
+                let className = 'bar-fill';
+                if (data.criticalPeaks && data.criticalPeaks.includes(freq)) {
                     className = 'bar-fill critical';
-                    value = Math.min(value + 0.2, 0.95);
-                } else if (data.peaks.includes(i * 83.33)) {
+                } else if (data.peaks && data.peaks.includes(freq)) {
                     className = 'bar-fill peak';
                 }
+
+                const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bar.setAttribute('x', startX + i * (barWidth + gap));
+                bar.setAttribute('y', 280 - barHeight);
+                bar.setAttribute('width', barWidth);
+                bar.setAttribute('height', barHeight);
+                bar.setAttribute('class', className);
+                bar.setAttribute('rx', 2);
+                bar.setAttribute('ry', 2);
                 
-                const height = value * scale;
-                const y = baseY - height;
-                
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', x);
-                rect.setAttribute('y', y);
-                rect.setAttribute('width', barWidth);
-                rect.setAttribute('height', height);
-                rect.setAttribute('class', className);
-                rect.setAttribute('rx', 2);
-                
-                spectrumBars.appendChild(rect);
+                spectrumBars.appendChild(bar);
             }
         }
+
+        deviceTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                deviceTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const device = tab.dataset.device;
+                if (device === 'motor') {
+                    motorFaults.style.display = 'flex';
+                    gearboxFaults.style.display = 'none';
+                    document.querySelector('#motor-faults .fault-tag').click();
+                } else {
+                    motorFaults.style.display = 'none';
+                    gearboxFaults.style.display = 'flex';
+                    document.querySelector('#gearbox-faults .fault-tag').click();
+                }
+            });
+        });
 
         faultTags.forEach(tag => {
             tag.addEventListener('click', () => {
                 faultTags.forEach(t => t.classList.remove('active'));
                 tag.classList.add('active');
-                drawSpectrum(tag.dataset.fault);
+                renderSpectrum(tag.dataset.fault);
             });
         });
 
-        drawSpectrum('unbalance');
-    </script>
-</body>
-</html>
+        renderSpectrum('motor_unbalance');
