@@ -21,6 +21,8 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 20px; }
         .logo { font-size: 18px; font-weight: 700; color: #1A3A5C; letter-spacing: 1px; }
@@ -662,28 +664,29 @@
     </div>
 
     <script>
-        const navItems = document.querySelectorAll('.nav-item');
-        const pages = document.querySelectorAll('.page');
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
 
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                navItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                const pageId = item.dataset.page;
-                pages.forEach(p => p.classList.remove('active'));
-                document.getElementById(pageId).classList.add('active');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    const pageId = item.dataset.page;
+                    pages.forEach(p => p.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                });
             });
-        });
 
-        const deviceTabs = document.querySelectorAll('.device-tab');
-        const motorFaults = document.getElementById('motor-faults');
-        const gearboxFaults = document.getElementById('gearbox-faults');
-        const faultTags = document.querySelectorAll('.fault-tag');
-        const spectrumBars = document.getElementById('spectrum-bars');
-        const spectrumDevice = document.getElementById('spectrum-device');
-        const spectrumPosition = document.getElementById('spectrum-position');
+            const deviceTabs = document.querySelectorAll('.device-tab');
+            const motorFaults = document.getElementById('motor-faults');
+            const gearboxFaults = document.getElementById('gearbox-faults');
+            const faultTags = document.querySelectorAll('.fault-tag');
+            const spectrumBars = document.getElementById('spectrum-bars');
+            const spectrumDevice = document.getElementById('spectrum-device');
+            const spectrumPosition = document.getElementById('spectrum-position');
 
-        const faultData = {
+            const faultData = {
             motor_unbalance: {
                 name: '不平衡',
                 device: '主风机电机 #M-102',
@@ -853,9 +856,9 @@
                 barHeight = Math.max(2, barHeight);
                 
                 let className = 'bar-fill';
-                if (data.criticalPeaks && data.criticalPeaks.includes(freq)) {
+                if (data.criticalPeaks && data.criticalPeaks.indexOf(freq) !== -1) {
                     className = 'bar-fill critical';
-                } else if (data.peaks && data.peaks.includes(freq)) {
+                } else if (data.peaks && data.peaks.indexOf(freq) !== -1) {
                     className = 'bar-fill peak';
                 }
 
@@ -891,11 +894,12 @@
         });
 
         faultTags.forEach(tag => {
-            tag.addEventListener('click', () => {
-                faultTags.forEach(t => t.classList.remove('active'));
-                tag.classList.add('active');
-                renderSpectrum(tag.dataset.fault);
+                tag.addEventListener('click', () => {
+                    faultTags.forEach(t => t.classList.remove('active'));
+                    tag.classList.add('active');
+                    renderSpectrum(tag.dataset.fault);
+                });
             });
-        });
 
-        renderSpectrum('motor_unbalance');
+            renderSpectrum('motor_unbalance');
+        });
