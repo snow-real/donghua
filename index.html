@@ -665,28 +665,28 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const navItems = document.querySelectorAll('.nav-item');
-            const pages = document.querySelectorAll('.page');
+            var navItems = document.querySelectorAll('.nav-item');
+            var pages = document.querySelectorAll('.page');
 
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    navItems.forEach(i => i.classList.remove('active'));
+            navItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    navItems.forEach(function(i) { i.classList.remove('active'); });
                     item.classList.add('active');
-                    const pageId = item.dataset.page;
-                    pages.forEach(p => p.classList.remove('active'));
+                    var pageId = item.dataset.page;
+                    pages.forEach(function(p) { p.classList.remove('active'); });
                     document.getElementById(pageId).classList.add('active');
                 });
             });
 
-            const deviceTabs = document.querySelectorAll('.device-tab');
-            const motorFaults = document.getElementById('motor-faults');
-            const gearboxFaults = document.getElementById('gearbox-faults');
-            const faultTags = document.querySelectorAll('.fault-tag');
-            const spectrumBars = document.getElementById('spectrum-bars');
-            const spectrumDevice = document.getElementById('spectrum-device');
-            const spectrumPosition = document.getElementById('spectrum-position');
+            var deviceTabs = document.querySelectorAll('.device-tab');
+            var motorFaults = document.getElementById('motor-faults');
+            var gearboxFaults = document.getElementById('gearbox-faults');
+            var faultTags = document.querySelectorAll('.fault-tag');
+            var spectrumBars = document.getElementById('spectrum-bars');
+            var spectrumDevice = document.getElementById('spectrum-device');
+            var spectrumPosition = document.getElementById('spectrum-position');
 
-            const faultData = {
+            var faultData = {
             motor_unbalance: {
                 name: '不平衡',
                 device: '主风机电机 #M-102',
@@ -834,35 +834,35 @@
         };
 
         function renderSpectrum(faultKey) {
-            const data = faultData[faultKey];
+            var data = faultData[faultKey];
             if (!data) return;
 
             spectrumDevice.textContent = data.device;
             spectrumPosition.textContent = data.position;
 
             spectrumBars.innerHTML = '';
-            const bars = 60;
-            const barWidth = 8;
-            const gap = 2;
-            const startX = 70;
-            const height = 240;
-            const maxValue = 1.0;
+            var bars = 60;
+            var barWidth = 8;
+            var gap = 2;
+            var startX = 70;
+            var height = 240;
+            var maxValue = 1.0;
 
-            for (let i = 0; i < bars; i++) {
-                const freq = Math.round((i + 1) * 5000 / bars);
-                const value = (i < data.values.length) ? data.values[i] : 0.01 + Math.random() * 0.02;
+            for (var i = 0; i < bars; i++) {
+                var freq = Math.round((i + 1) * 5000 / bars);
+                var value = (i < data.values.length) ? data.values[i] : 0.01 + Math.random() * 0.02;
                 
-                let barHeight = (value / maxValue) * height;
+                var barHeight = (value / maxValue) * height;
                 barHeight = Math.max(2, barHeight);
                 
-                let className = 'bar-fill';
+                var className = 'bar-fill';
                 if (data.criticalPeaks && data.criticalPeaks.indexOf(freq) !== -1) {
                     className = 'bar-fill critical';
                 } else if (data.peaks && data.peaks.indexOf(freq) !== -1) {
                     className = 'bar-fill peak';
                 }
 
-                const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                var bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 bar.setAttribute('x', startX + i * (barWidth + gap));
                 bar.setAttribute('y', 280 - barHeight);
                 bar.setAttribute('width', barWidth);
@@ -875,12 +875,12 @@
             }
         }
 
-        deviceTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                deviceTabs.forEach(t => t.classList.remove('active'));
+        deviceTabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                deviceTabs.forEach(function(t) { t.classList.remove('active'); });
                 tab.classList.add('active');
                 
-                const device = tab.dataset.device;
+                var device = tab.dataset.device;
                 if (device === 'motor') {
                     motorFaults.style.display = 'flex';
                     gearboxFaults.style.display = 'none';
@@ -893,13 +893,13 @@
             });
         });
 
-        faultTags.forEach(tag => {
-                tag.addEventListener('click', () => {
-                    faultTags.forEach(t => t.classList.remove('active'));
-                    tag.classList.add('active');
-                    renderSpectrum(tag.dataset.fault);
-                });
+        faultTags.forEach(function(tag) {
+            tag.addEventListener('click', function() {
+                faultTags.forEach(function(t) { t.classList.remove('active'); });
+                tag.classList.add('active');
+                renderSpectrum(tag.dataset.fault);
             });
+        });
 
             renderSpectrum('motor_unbalance');
         });
