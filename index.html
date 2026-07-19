@@ -238,24 +238,44 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
     <!-- ===== 系统总览 ===== -->
     <div id="overview" class="page active">
         <div class="kpi-grid">
-            <div class="kpi-card"><div class="kpi-label">设备总数</div><div class="kpi-value">128<span class="kpi-unit">台</span></div></div>
-            <div class="kpi-card"><div class="kpi-label">在线率</div><div class="kpi-value">97.6<span class="kpi-unit">%</span></div></div>
-            <div class="kpi-card"><div class="kpi-label">今日预警</div><div class="kpi-value warning">3<span class="kpi-unit">条</span></div></div>
-            <div class="kpi-card"><div class="kpi-label">健康指数</div><div class="kpi-value health">92.8<span class="kpi-unit">分</span></div></div>
+            <div class="kpi-card"><div class="kpi-label">测点总数</div><div class="kpi-value" id="kpi-total">21<span class="kpi-unit">个</span></div></div>
+            <div class="kpi-card"><div class="kpi-label">在线率</div><div class="kpi-value" id="kpi-online">85.7<span class="kpi-unit">%</span></div></div>
+            <div class="kpi-card"><div class="kpi-label">今日预警/报警</div><div class="kpi-value warning" id="kpi-warnings">6<span class="kpi-unit">条</span></div></div>
+            <div class="kpi-card"><div class="kpi-label">健康指数</div><div class="kpi-value health" id="kpi-health">71.4<span class="kpi-unit">分</span></div></div>
         </div>
         <div class="overview-cards">
             <div class="card">
-                <div class="card-title">防爆设备详情</div>
-                <div class="ex-label">Ex ia ⅡC T4 Ga</div>
-                <div class="ex-badge">最高保护等级 Ga</div>
-                <table class="ex-table">
-                    <tr><td class="ex-key">Ex</td><td class="ex-value">防爆标志</td></tr>
-                    <tr><td class="ex-key">ia</td><td class="ex-value">本质安全型（最高等级，允许两个故障）</td></tr>
-                    <tr><td class="ex-key">Ⅱ</td><td class="ex-value">工厂用（非煤矿）</td></tr>
-                    <tr><td class="ex-key">C</td><td class="ex-value">ⅡC级（最高气体组别，可测氢气）</td></tr>
-                    <tr><td class="ex-key">T4</td><td class="ex-value">温度组别≤135℃</td></tr>
-                    <tr><td class="ex-key">Ga</td><td class="ex-value">设备保护级别"很高"，可用于0区/1区/2区</td></tr>
-                </table>
+                <div class="card-title">设备健康概览</div>
+                <div style="display:flex;align-items:center;gap:20px;">
+                    <!-- 环形图 -->
+                    <svg width="150" height="150" viewBox="0 0 150 150" id="health-ring">
+                        <circle cx="75" cy="75" r="55" fill="none" stroke="#e2e8f0" stroke-width="14"/>
+                        <circle id="ring-normal" cx="75" cy="75" r="55" fill="none" stroke="#22c55e" stroke-width="14" stroke-dasharray="0 345" stroke-linecap="round" transform="rotate(-90 75 75)"/>
+                        <circle id="ring-warning" cx="75" cy="75" r="55" fill="none" stroke="#F97316" stroke-width="14" stroke-dasharray="0 345" stroke-linecap="round" transform="rotate(-90 75 75)"/>
+                        <circle id="ring-alarm" cx="75" cy="75" r="55" fill="none" stroke="#ef4444" stroke-width="14" stroke-dasharray="0 345" stroke-linecap="round" transform="rotate(-90 75 75)"/>
+                        <text x="75" y="68" text-anchor="middle" fill="#1A3A5C" font-size="22" font-weight="700"><tspan id="ring-total">21</tspan></text>
+                        <text x="75" y="88" text-anchor="middle" fill="#64748b" font-size="11">总测点数</text>
+                    </svg>
+                    <!-- 统计列表 -->
+                    <div style="flex:1;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#dcfce7;border-radius:8px;margin-bottom:8px;">
+                            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#166534;font-weight:600;">🟢 正常</div>
+                            <span style="font-size:20px;font-weight:700;color:#166534;" id="count-normal">15</span>
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#ffedd5;border-radius:8px;margin-bottom:8px;">
+                            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#9a3412;font-weight:600;">🟡 预警</div>
+                            <span style="font-size:20px;font-weight:700;color:#9a3412;" id="count-warning">4</span>
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fee2e2;border-radius:8px;">
+                            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#991b1b;font-weight:600;">🔴 报警</div>
+                            <span style="font-size:20px;font-weight:700;color:#991b1b;" id="count-alarm">2</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:8px;font-size:12px;color:#64748b;display:flex;justify-content:space-between;">
+                    <span>健康度：<b style="color:#22c55e;" id="health-rate">71.4%</b></span>
+                    <span id="health-trend" style="color:#22c55e;">▲ 较昨日 +2.1%</span>
+                </div>
             </div>
             <div class="card">
                 <div class="card-title">电机状态监控</div>
@@ -1204,9 +1224,63 @@ function refreshTree() {
     renderTree(treeData, container);
 }
 
+function updateHealthOverview() {
+    var normal = 0, warning = 0, alarm = 0, online = 0;
+    for (var i = 0; i < measurePoints.length; i++) {
+        if (measurePoints[i].health === 'good') normal++;
+        else if (measurePoints[i].health === 'attention') warning++;
+        else alarm++;
+        if (measurePoints[i].status === 'online') online++;
+    }
+    var total = measurePoints.length;
+    var circumference = 2 * Math.PI * 55; // ~345.6
+
+    document.getElementById('count-normal').textContent = normal;
+    document.getElementById('count-warning').textContent = warning;
+    document.getElementById('count-alarm').textContent = alarm;
+    document.getElementById('ring-total').textContent = total;
+
+    var warnOffset = (normal / total) * circumference;
+    var alarmOffset = warnOffset + (warning / total) * circumference;
+
+    document.getElementById('ring-normal').setAttribute('stroke-dasharray', (normal/total*circumference).toFixed(1)+' '+(circumference).toFixed(1));
+    document.getElementById('ring-warning').setAttribute('stroke-dasharray', (warning/total*circumference).toFixed(1)+' '+(circumference).toFixed(1));
+    document.getElementById('ring-warning').setAttribute('stroke-dashoffset', -warnOffset.toFixed(1));
+    document.getElementById('ring-alarm').setAttribute('stroke-dasharray', (alarm/total*circumference).toFixed(1)+' '+(circumference).toFixed(1));
+    document.getElementById('ring-alarm').setAttribute('stroke-dashoffset', -alarmOffset.toFixed(1));
+
+    var rate = total > 0 ? ((normal / total) * 100).toFixed(1) : '0.0';
+    document.getElementById('health-rate').textContent = rate + '%';
+    var rateVal = parseFloat(rate);
+    var trendEl = document.getElementById('health-trend');
+    if (rateVal >= 90) {
+        document.getElementById('health-rate').style.color = '#22c55e';
+        trendEl.textContent = '▲ 较昨日 +2.1%';
+        trendEl.style.color = '#22c55e';
+        document.getElementById('kpi-health').className = 'kpi-value health';
+    } else if (rateVal >= 70) {
+        document.getElementById('health-rate').style.color = '#F97316';
+        trendEl.textContent = '▼ 较昨日 -0.8%';
+        trendEl.style.color = '#F97316';
+        document.getElementById('kpi-health').className = 'kpi-value warning';
+    } else {
+        document.getElementById('health-rate').style.color = '#ef4444';
+        trendEl.textContent = '▼ 较昨日 -3.2%';
+        trendEl.style.color = '#ef4444';
+        document.getElementById('kpi-health').className = 'kpi-value warning';
+    }
+
+    // Update KPI cards
+    document.getElementById('kpi-total').innerHTML = total+'<span class="kpi-unit">个</span>';
+    document.getElementById('kpi-online').innerHTML = (total>0?(online/total*100).toFixed(1):'0')+'<span class="kpi-unit">%</span>';
+    document.getElementById('kpi-warnings').innerHTML = (warning+alarm)+'<span class="kpi-unit">条</span>';
+    document.getElementById('kpi-health').innerHTML = rate+'<span class="kpi-unit">分</span>';
+}
+
 // ===== 初始化 =====
 renderTable();
 refreshTree();
+updateHealthOverview();
 drawSpectrum('motor_unbalance');
 startMonitorLoop();
 </script>
